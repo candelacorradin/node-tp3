@@ -1,0 +1,26 @@
+{
+  "name": "node-tp3",
+  "version": "1.0.0",
+  "description": "API REST de tareas con Express y MongoDB (Mongoose)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/candelacorradin/node-tp3.git"
+  },
+  "keywords": [],
+  "author": "Candela Corradin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/candelacorradin/node-tp3/issues"
+  },
+  "homepage": "https://github.com/candelacorradin/node-tp3#readme",
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "mongoose": "^9.12.0"
+  }
+}

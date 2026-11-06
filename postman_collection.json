@@ -1,0 +1,85 @@
+{
+  "info": {
+    "name": "API Tareas - TP3 MongoDB",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "tareaId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "POST /tareas - Crear tarea",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"titulo\": \"Estudiar Mongoose\",\n  \"descripcion\": \"Repasar esquemas y modelos\"\n}" },
+        "url": "{{baseUrl}}/tareas"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "const t = pm.response.json();",
+        "pm.collectionVariables.set('tareaId', t._id);",
+        "pm.test('Status 201', () => pm.response.to.have.status(201));",
+        "pm.test('Aplica valores por defecto', () => { pm.expect(t.completada).to.eql(false); pm.expect(t.prioridad).to.eql('media'); });"
+      ] } }]
+    },
+    {
+      "name": "POST /tareas - Validación (sin título)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"descripcion\": \"Tarea sin título\",\n  \"prioridad\": \"urgente\"\n}" },
+        "url": "{{baseUrl}}/tareas"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Status 400', () => pm.response.to.have.status(400));",
+        "pm.test('Informa los errores del esquema', () => pm.expect(pm.response.json().detalles).to.have.lengthOf(2));"
+      ] } }]
+    },
+    {
+      "name": "GET /tareas - Listar tareas",
+      "request": { "method": "GET", "url": "{{baseUrl}}/tareas" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Status 200', () => pm.response.to.have.status(200));",
+        "pm.test('Incluye la tarea creada', () => pm.expect(pm.response.json().map(t => t._id)).to.include(pm.collectionVariables.get('tareaId')));"
+      ] } }]
+    },
+    {
+      "name": "GET /tareas/:id - Obtener tarea",
+      "request": { "method": "GET", "url": "{{baseUrl}}/tareas/{{tareaId}}" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Status 200', () => pm.response.to.have.status(200));",
+        "pm.test('ID correcto', () => pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('tareaId')));"
+      ] } }]
+    },
+    {
+      "name": "PUT /tareas/:id - Actualizar tarea",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"completada\": true,\n  \"prioridad\": \"alta\"\n}" },
+        "url": "{{baseUrl}}/tareas/{{tareaId}}"
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "const t = pm.response.json();",
+        "pm.test('Status 200', () => pm.response.to.have.status(200));",
+        "pm.test('Cambios aplicados', () => { pm.expect(t.completada).to.eql(true); pm.expect(t.prioridad).to.eql('alta'); });"
+      ] } }]
+    },
+    {
+      "name": "DELETE /tareas/:id - Eliminar tarea",
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/tareas/{{tareaId}}" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Status 200', () => pm.response.to.have.status(200));",
+        "pm.test('Devuelve la tarea eliminada', () => pm.expect(pm.response.json().tarea._id).to.eql(pm.collectionVariables.get('tareaId')));"
+      ] } }]
+    },
+    {
+      "name": "GET /tareas/:id - Verificar eliminación",
+      "request": { "method": "GET", "url": "{{baseUrl}}/tareas/{{tareaId}}" },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('Status 404', () => pm.response.to.have.status(404));"
+      ] } }]
+    }
+  ]
+}
